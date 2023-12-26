@@ -18,6 +18,7 @@ class BoardUpdate(BaseModel):
 
 
 class BoardGet(BaseModel):
+    id: int
     name: str
     description: str = "Board Description"
 

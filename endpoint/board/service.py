@@ -8,6 +8,8 @@ from data.db.models import Board
 async def get_board_by_id(board_id: int) -> Board:
     try:
         res: Board = await get_board(board_id)
+        if not res:
+            raise HTTPException(status_code=400, detail="존재하지 않는 게시판입니다.")
     except IntegrityError as e:
         code: int = e.orig.pgcode
         if code == 23503:
@@ -49,7 +51,7 @@ async def create_new_board(board_name: str, board_description: str, user_id: int
 
 async def update_existing_board(board_id: int, board_name: str, board_description: str, user_id: int):
     original_board = await get_board(board_id)
-    if not original_board.name == board_name:
+    if not original_board.name:
         raise HTTPException(status_code=400, detail="존재하지 않는 게시판입니다.")
     elif not original_board.creator_id == user_id:
         raise HTTPException(status_code=401, detail="권한이 없습니다.")
@@ -65,6 +67,9 @@ async def update_existing_board(board_id: int, board_name: str, board_descriptio
 
 async def delete_existing_board(board_id: int, user_id: int):
     original_board = await get_board(board_id)
+    if not original_board:
+        raise HTTPException(status_code=400, detail="존재하지 않는 게시판입니다.")
+
     if not original_board.creator_id == user_id:
         raise HTTPException(status_code=401, detail="권한이 없습니다.")
 

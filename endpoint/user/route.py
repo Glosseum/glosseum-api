@@ -47,5 +47,5 @@ async def update_user(_user_update: UserUpdate, user: User = Depends(get_current
 
 
 @router.delete("/{username}")
-async def delete_user(user: User = Depends(get_current_user())) -> None:
+async def delete_user(user: User = Depends(get_current_user)) -> None:
     return await delete_current_user(user.username)

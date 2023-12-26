@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, ForeignKey, Boolean
+from sqlalchemy import Column, Integer, String, ForeignKey, Boolean, event
 from sqlalchemy.orm import relationship
 from data.db.database import Base
 
@@ -16,7 +16,7 @@ class Board(Base):
     __tablename__ = "board"
     id = Column(Integer, primary_key=True, index=True)
 
-    name = Column(String, unique=True, index=True)
+    name = Column(String, index=True)
     description = Column(String)
 
     creator_id = Column(Integer, ForeignKey("user.id"))
@@ -27,7 +27,7 @@ class Article(Base):
     __tablename__ = "article"
     id = Column(Integer, primary_key=True, index=True)
 
-    name = Column(String, unique=True, index=True)
+    name = Column(String, index=True)
     content = Column(String)
 
     creator_id = Column(Integer, ForeignKey("user.id"))
