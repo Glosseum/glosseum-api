@@ -13,8 +13,8 @@ router = APIRouter(
 @router.post("/", status_code=status.HTTP_204_NO_CONTENT)
 async def create_board(_board_create: BoardCreate, user=Depends(get_current_user)):
     await create_new_board(
-        board_name=_board_create.board_name,
-        board_description=_board_create.board_description,
+        board_name=_board_create.name,
+        board_description=_board_create.description,
         user_id=user.id
     )
 
@@ -33,8 +33,8 @@ async def get_boards(per_page: int = 10, page: int = 1) -> list[BoardGet]:
 async def update_board(board_id: int, _board_update: BoardUpdate, user=Depends(get_current_user)):
     await update_existing_board(
         board_id=board_id,
-        board_name=_board_update.board_name,
-        board_description=_board_update.board_description,
+        board_name=_board_update.name,
+        board_description=_board_update.description,
         user_id=user.id
     )
 

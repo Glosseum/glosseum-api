@@ -2,7 +2,7 @@ from pydantic import BaseModel
 
 
 class ArticleCreate(BaseModel):
-    title: str
+    name: str
     content: str
 
     class Config:
@@ -19,7 +19,7 @@ class ArticleAppend(BaseModel):
 
 
 class ArticleUpdate(BaseModel):
-    title: str
+    name: str
     content: str
 
     class Config:
@@ -27,7 +27,8 @@ class ArticleUpdate(BaseModel):
 
 
 class ArticleGet(BaseModel):
-    title: str
+    id: int
+    name: str
     content: str
     creator_id: int
     path: str

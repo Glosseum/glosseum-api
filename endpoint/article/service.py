@@ -2,10 +2,12 @@ from fastapi import HTTPException
 from sqlalchemy.exc import IntegrityError
 
 import endpoint.article.repository as repo
+from endpoint.board.repository import get_board
 from data.db.models import Board, User, Article
 
 
 async def create_article(name: str, content: str, board_id: int, user_id: int) -> None:
+    latest_key: int = await repo.get_latest_pk()
     try:
         await repo.create_article(
             {
@@ -13,7 +15,7 @@ async def create_article(name: str, content: str, board_id: int, user_id: int) -
                 "content": content,
                 "board_id": board_id,
                 "creator_id": user_id,
-                "path": f"{board_id}",
+                "path": f"{latest_key + 1}",
                 "path_logical": "ROOT"
             }
         )
@@ -31,6 +33,8 @@ async def append_article(prev_article_id: int, name: str, content: str, logic: s
     if not prev_article:
         raise HTTPException(status_code=400, detail="존재하지 않는 게시글입니다.")
 
+    latest_key: int = await repo.get_latest_pk()
+
     try:
         await repo.create_article(
             {
@@ -38,7 +42,7 @@ async def append_article(prev_article_id: int, name: str, content: str, logic: s
                 "content": content,
                 "board_id": board_id,
                 "creator_id": user_id,
-                "path": prev_article.path + f"/{prev_article.id}",
+                "path": prev_article.path + f"/{latest_key + 1}",
                 "path_logical": prev_article.path_logical + f"/{logic}"
             }
         )
@@ -53,6 +57,8 @@ async def append_article(prev_article_id: int, name: str, content: str, logic: s
 async def get_article_by_id(article_id: int) -> Article:
     try:
         res: Article = await repo.get_article(article_id)
+        if not res:
+            raise HTTPException(status_code=400, detail="존재하지 않는 게시글입니다.")
     except IntegrityError as e:
         code: int = e.orig.pgcode
         if code == 23503:
@@ -63,6 +69,10 @@ async def get_article_by_id(article_id: int) -> Article:
 
 
 async def get_article_list_by_board_id(board_id: int) -> list[Article]:
+    board = await get_board(board_id)
+    if not board:
+        raise HTTPException(status_code=400, detail="존재하지 않는 게시판입니다.")
+
     try:
         res: list[Article] = await repo.get_articles_from_board(board_id)
     except IntegrityError as e:
@@ -95,7 +105,7 @@ async def update_article(article_id: int, name: str, content: str, user_id: int)
 async def delete_article(article_id: int, user_id: int):
     original_article: Article = await repo.get_article(article_id)
 
-    if not original_article.name:
+    if not original_article:
         raise HTTPException(status_code=400, detail="존재하지 않는 게시글입니다.")
     elif not original_article.creator_id == user_id:
         raise HTTPException(status_code=401, detail="권한이 없습니다.")

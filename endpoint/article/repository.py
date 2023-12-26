@@ -51,3 +51,15 @@ async def update_article(article_id: int, article_req: dict, session: AsyncSessi
 async def delete_article(article_id: int, session: AsyncSession = None) -> None:
     stmt = delete(Article).where(Article.id == article_id)
     await session.execute(stmt)
+
+
+@Transactional()
+async def get_latest_pk(session: AsyncSession = None) -> int:
+    stmt = (
+        select(Article.id)
+        .order_by(Article.id.desc())
+        .limit(1)
+    )
+    result = await session.execute(stmt)
+
+    return result.scalars().first()
