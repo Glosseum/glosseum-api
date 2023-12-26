@@ -41,8 +41,6 @@ async def create_article(article_req: dict, session: AsyncSession = None) -> Non
 
     await session.refresh(_article)
 
-    print(_article.__dict__)
-
 
 @Transactional()
 async def update_article(article_id: int, article_req: dict, session: AsyncSession = None) -> None:
