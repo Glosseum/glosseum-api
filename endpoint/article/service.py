@@ -7,7 +7,6 @@ from data.db.models import Board, User, Article
 
 
 async def create_article(name: str, content: str, board_id: int, user_id: int) -> None:
-    latest_key: int = await repo.get_latest_pk()
     try:
         await repo.create_article(
             {
@@ -15,7 +14,7 @@ async def create_article(name: str, content: str, board_id: int, user_id: int) -
                 "content": content,
                 "board_id": board_id,
                 "creator_id": user_id,
-                "path": f"{latest_key + 1}",
+                "path": "",
                 "path_logical": "ROOT"
             }
         )
@@ -33,8 +32,6 @@ async def append_article(prev_article_id: int, name: str, content: str, logic: s
     if not prev_article:
         raise HTTPException(status_code=400, detail="존재하지 않는 게시글입니다.")
 
-    latest_key: int = await repo.get_latest_pk()
-
     try:
         await repo.create_article(
             {
@@ -42,7 +39,7 @@ async def append_article(prev_article_id: int, name: str, content: str, logic: s
                 "content": content,
                 "board_id": board_id,
                 "creator_id": user_id,
-                "path": prev_article.path + f"/{latest_key + 1}",
+                "path": prev_article.path,
                 "path_logical": prev_article.path_logical + f"/{logic}"
             }
         )

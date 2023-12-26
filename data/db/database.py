@@ -1,5 +1,5 @@
 from functools import wraps
-from sqlalchemy import create_engine, MetaData
+from sqlalchemy import create_engine, MetaData, event
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from config import DB_CONFIG
@@ -29,12 +29,12 @@ class Transactional:
                 try:
                     kwargs["session"] = session
                     result = await func(*args, **kwargs)
+                    print(f"commit for {func.__name__}")
                     await session.commit()
                 except Exception as e:
                     # logger.exception(f"{type(e).__name__} : {str(e)}")
                     await session.rollback()
                     raise e
-
                 return result
 
         return _transactional

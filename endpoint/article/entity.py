@@ -11,7 +11,7 @@ class ArticleCreate(BaseModel):
 
 class ArticleAppend(BaseModel):
     logic: str = "AGREE"
-    title: str
+    name: str
     content: str
 
     class Config:

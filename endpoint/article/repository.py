@@ -1,5 +1,5 @@
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, delete, update
+from sqlalchemy import select, delete, update, event
 from data.db.database import Transactional
 from data.db.models import Board, User, Article
 
@@ -35,7 +35,13 @@ async def create_article(article_req: dict, session: AsyncSession = None) -> Non
     session.add(_article)
 
     await session.commit()
+
+    _article.path = _article.path + f"/{_article.id}"
+    await session.commit()
+
     await session.refresh(_article)
+
+    print(_article.__dict__)
 
 
 @Transactional()
@@ -54,12 +60,9 @@ async def delete_article(article_id: int, session: AsyncSession = None) -> None:
 
 
 @Transactional()
-async def get_latest_pk(session: AsyncSession = None) -> int:
+async def update_article_path(article_id: int, path: str, session: AsyncSession = None) -> None:
     stmt = (
-        select(Article.id)
-        .order_by(Article.id.desc())
-        .limit(1)
+        update(Article)
+        .where(Article.id == article_id).values(path=path)
     )
-    result = await session.execute(stmt)
-
-    return result.scalars().first()
+    await session.execute(stmt)
