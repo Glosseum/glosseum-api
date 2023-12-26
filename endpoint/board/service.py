@@ -49,7 +49,7 @@ async def create_new_board(board_name: str, board_description: str, user_id: int
 
 async def update_existing_board(board_id: int, board_name: str, board_description: str, user_id: int):
     original_board = await get_board(board_id)
-    if not original_board.name == board_name:
+    if not original_board.name:
         raise HTTPException(status_code=400, detail="존재하지 않는 게시판입니다.")
     elif not original_board.creator_id == user_id:
         raise HTTPException(status_code=401, detail="권한이 없습니다.")
