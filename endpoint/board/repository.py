@@ -17,6 +17,18 @@ async def get_board(board_id: int, session: AsyncSession = None) -> Board:
 
 
 @Transactional()
+async def get_board_by_name(board_name: str, session: AsyncSession = None) -> Board:
+    stmt = (
+        select(Board)
+        .where(Board.name == board_name)
+    )
+
+    res = await session.execute(stmt)
+
+    return res.scalars().first()
+
+
+@Transactional()
 async def get_boards(per_page: int, page: int, session: AsyncSession = None) -> list[Board]:
     stmt = (
         select(Board)
