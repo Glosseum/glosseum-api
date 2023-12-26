@@ -5,26 +5,12 @@ from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from config import DB_CONFIG
 
 
-if not DB_CONFIG['rdb'].startswith('sqlite'):
-    SQLALCHEMY_DATABASE_URL =\
-        f"{DB_CONFIG['rdb']}://{DB_CONFIG['db_user']}:{DB_CONFIG['db_password']}@{DB_CONFIG['host']}:{DB_CONFIG['port']}/{DB_CONFIG['db']}"
-else:
-    SQLALCHEMY_DATABASE_URL =\
-        f"{DB_CONFIG['rdb']}:///./{DB_CONFIG['db']}"
+SQLALCHEMY_DATABASE_URL =\
+    f"{DB_CONFIG['rdb']}://{DB_CONFIG['db_user']}:{DB_CONFIG['db_password']}@{DB_CONFIG['host']}:{DB_CONFIG['port']}/{DB_CONFIG['db']}"
 
 
-engine = create_engine(SQLALCHEMY_DATABASE_URL)
 metadata = MetaData()
-
-
-if SQLALCHEMY_DATABASE_URL.startswith("sqlite"):
-    engine = create_async_engine(
-        SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False}
-    )
-elif SQLALCHEMY_DATABASE_URL.startswith("postgresql"):
-    engine = create_async_engine(SQLALCHEMY_DATABASE_URL)
-else:
-    raise Exception("unknown database")
+engine = create_async_engine(SQLALCHEMY_DATABASE_URL)
 
 Base = declarative_base()
 

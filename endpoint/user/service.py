@@ -16,28 +16,36 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 60*24
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/user/login")
 
 
-# TODO: 유저 권한 체크 등은 RDS 연결 후 추가 (PostgreSQL)
-
 async def register_user(username: str, email: str, password1: str, password2: str) -> None:
     if password1 != password2:
         raise HTTPException(status_code=400, detail="비밀번호가 일치하지 않습니다.")
 
-    return await create_user(
-        {
-            "username": username,
-            "email": email,
-            "password": pwd_context.hash(password1)
-        }
-    )
+    try:
+        await create_user(
+            {
+                "username": username,
+                "email": email,
+                "password": pwd_context.hash(password1)
+            }
+        )
+
+    except IntegrityError as e:
+        code: int = int(e.orig.pgcode)
+        if code == 23505:
+            raise HTTPException(status_code=400, detail="Existing Username or Email.")
+        else:
+            raise HTTPException(status_code=500, detail=f"Unknown Error. {e.orig.pgcode}: {e.orig}")
 
 
 async def get_user_by_username(username: str) -> User:
     try:
         user = await get_user(username)
     except IntegrityError as e:
-        # TODO: 에러코드 추가
-        raise HTTPException(status_code=400, detail="존재하지 않는 유저입니다.")
-
+        code: int = int(e.orig.pgcode)
+        if code == 23503:
+            raise HTTPException(status_code=400, detail="User ID Not Found.")
+        else:
+            raise HTTPException(status_code=500, detail=f"Unknown Error. {e.orig.pgcode}: {e.orig}")
     return user
 
 
@@ -83,14 +91,30 @@ async def get_current_user(token: str = Depends(oauth2_scheme)) -> User:
 
 
 async def update_current_user(username_original: str, username_to_update: str, email_to_update: str) -> None:
-    return await update_user(
-        username=username_original,
-        user_req={
-            "username": username_to_update,
-            "email": email_to_update
-        }
-    )
+    try:
+        await update_user(
+            username=username_original,
+            user_req={
+                "username": username_to_update,
+                "email": email_to_update
+            }
+        )
+    except IntegrityError as e:
+        code: int = int(e.orig.pgcode)
+        if code == 23505:
+            raise HTTPException(status_code=400, detail="Existing Username or Email.")
+        elif code == 23503:
+            raise HTTPException(status_code=400, detail="User ID Not Found.")
+        else:
+            raise HTTPException(status_code=500, detail=f"Unknown Error. {e.orig.pgcode}: {e.orig}")
 
 
 async def delete_current_user(username: str) -> None:
-    return await delete_user(username)
+    try:
+        await delete_user(username)
+    except IntegrityError as e:
+        code: int = int(e.orig.pgcode)
+        if code == 23503:
+            raise HTTPException(status_code=400, detail="User ID Not Found.")
+        else:
+            raise HTTPException(status_code=500, detail=f"Unknown Error. {e.orig.pgcode}: {e.orig}")

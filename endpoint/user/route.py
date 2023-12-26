@@ -40,7 +40,7 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
 
 @router.get("/me", response_model=UserGet)
 async def get_user_me(user: User = Depends(get_current_user)) -> UserGet:
-    return user  # 추후 작성 게시글 모아보기 등도 추가..
+    return user  # 추후 작성 게시글 모아 보기 등도 추가..
 
 
 @router.put("/{username}")
@@ -53,5 +53,5 @@ async def update_user(_user_update: UserUpdate, user: User = Depends(get_current
 
 
 @router.delete("/{username}")
-async def delete_user(username: str) -> None:
-    return await delete_current_user(username)
+async def delete_user(user: User = Depends(get_current_user())) -> None:
+    return await delete_current_user(user.username)
