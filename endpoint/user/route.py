@@ -1,9 +1,3 @@
-"""
-JWT 기반 로그인 구현
-/register
-/login
-"""
-
 from fastapi import APIRouter, Depends, status
 from fastapi.security import OAuth2PasswordRequestForm
 from endpoint.user.service import register_user, get_current_user, update_current_user, verify_user, delete_current_user
