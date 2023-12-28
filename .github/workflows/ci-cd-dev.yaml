@@ -18,7 +18,7 @@ jobs:
     - name: Build & push Docker image
       uses: mr-smithers-excellent/docker-build-push@v6
       with:
-        image: {{ secrets.IMAGE_REGISTRY }}/{{ secrets.IMAGE_NAME }}
+        image: invalidid56/glosseum-dev
         tags: 0.1
         registry: docker.io
         dockerfile: Dockerfile
@@ -58,5 +58,5 @@ jobs:
             export DB_USER=${{ secrets.DB_USER }}
             export DB_PASSWORD=${{ secrets.DB_PASSWORD }}
             
-            docker pull {{ secrets.IMAGE_REGISTRY }}/{{ secrets.IMAGE_NAME }}
+            docker pull invalidid56/glosseum-dev
             docker-compose up
