@@ -7,7 +7,8 @@ from data.db.models import Board, User, Article
 
 
 async def create_article(name: str, content: str, board_id: int, user_id: int) -> None:
-    if await repo.get_articles_from_board(board_id) is not None:
+    prev: list = await repo.get_articles_from_board(board_id)
+    if len(prev) != 0:
         raise HTTPException(status_code=400, detail="이미 게시글이 존재하는 게시판입니다, 게시글을 추가해주세요.")
 
     try:

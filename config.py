@@ -10,7 +10,7 @@ DB_CONFIG = {
     "rdb": os.getenv("RDB", "postgresql+asyncpg"),
     "db_user": os.getenv("DB_USER", "junseokang"),
     "db_password": os.getenv("DB_PASSWORD", ""),
-    "host": os.getenv("DB_HOST", "localhost"),
+    "host": os.getenv("DB_HOST", "host.docker.internal"),
     "port": os.getenv("DB_PORT", "5432"),
     "db": os.getenv("DB", "glosseum_dev"),
 }

@@ -1,0 +1,59 @@
+name: Deploy to EC2 (dev)
+on:
+  push:
+      branches:
+        ["dev"]
+jobs:
+
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+    - name: checkout
+      uses: actions/checkout@master
+
+    - uses: mr-smithers-excellent/docker-build-push@v6
+      name: Build & push Docker image
+      with:
+        image: {{ secrets.IMAGE_REGISTRY }}/{{ secrets.IMAGE_NAME }}
+        tags: 0.1
+        registry: docker.io
+        dockerfile: Dockerfile
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+
+  deploy:
+    name: Deploy
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@master
+
+      - name: setting secrets
+        run: |
+          export DB_HOST=${{ secrets.DB_HOST }}
+          export DB_USER=${{ secrets.DB_USER }}
+          export DB_PASSWORD=${{ secrets.DB_PASSWORD }}
+        env:
+          DB_HOST: ${{ secrets.DB_HOST }}
+          DB_USER: ${{ secrets.DB_USER }}
+          $DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+
+
+      - name: executing remote ssh commands using password # TODO: 서버에 접속하여 Docker image pull 및 컨테이너 시작
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ubuntu
+          key: ${{ secrets.EC2_KEY }}
+          script: |
+            docker stop $(docker ps -a -q)
+            docker rm {{ secrets.IMAGE_NAME }}
+            
+            export DB_HOST=${{ secrets.DB_HOST }}
+            export DB_USER=${{ secrets.DB_USER }}
+            export DB_PASSWORD=${{ secrets.DB_PASSWORD }}
+            
+            docker pull {{ secrets.IMAGE_REGISTRY }}/{{ secrets.IMAGE_NAME }}
+            docker-compose up
