@@ -77,4 +77,4 @@ jobs:
             
             docker pull invalidid56/glosseum-dev:0.1
             
-            docker-compose up
+            docker-compose up -d
