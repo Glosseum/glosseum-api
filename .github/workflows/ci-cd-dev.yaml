@@ -15,8 +15,8 @@ jobs:
     - name: checkout
       uses: actions/checkout@master
 
-    - uses: mr-smithers-excellent/docker-build-push@v6
-      name: Build & push Docker image
+    - name: Build & push Docker image
+      uses: mr-smithers-excellent/docker-build-push@v6
       with:
         image: {{ secrets.IMAGE_REGISTRY }}/{{ secrets.IMAGE_NAME }}
         tags: 0.1
