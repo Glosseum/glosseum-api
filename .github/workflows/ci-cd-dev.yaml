@@ -1,5 +1,8 @@
 name: Deploy to EC2 (dev)
 on:
+  merge_group:
+    branches:
+      - ["dev"]
   push:
       branches:
         ["dev"]
