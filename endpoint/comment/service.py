@@ -2,22 +2,22 @@ from fastapi import HTTPException
 from sqlalchemy.exc import IntegrityError
 
 import endpoint.comment.repository as repo
-from data.db.models import Board, User, Article
+from data.db.models import Board, User, Article, Comment
 
 
-async def create_comment(name: str, content: str, article_id: int, user_id: int) -> None:
+async def create_new_comment(content: str, article_id: int, user_id: int) -> Comment | None:
     if len(content) >= 100:
         raise HTTPException(status_code=400, detail="댓글은 100자 이내여야 합니다.")
 
     try:
-        await repo.create_comment(
+        res = await repo.create_comment(
             {
-                "name": name,
                 "content": content,
                 "article_id": article_id,
                 "creator_id": user_id
             }
         )
+        return res
     except IntegrityError as e:
         code: int = e.orig.pgcode
         if code == 23503:
@@ -26,7 +26,7 @@ async def create_comment(name: str, content: str, article_id: int, user_id: int)
             raise HTTPException(status_code=500, detail=f"Unknown DB Error: {e.orig}")
 
 
-async def read_comment(comment_id: int) -> Article:
+async def read_comment_by_id(comment_id: int) -> Article:
     try:
         res: Article = await repo.get_comment(comment_id)
         if not res:
@@ -41,7 +41,7 @@ async def read_comment(comment_id: int) -> Article:
     return res
 
 
-async def get_comments_from_article(article_id: int) -> list[Article]:
+async def read_comments_by_article(article_id: int) -> list[Article]:
     try:
         res: list[Article] = await repo.get_comments_from_article(article_id)
     except IntegrityError as e:
