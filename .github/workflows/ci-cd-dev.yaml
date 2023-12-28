@@ -58,8 +58,6 @@ jobs:
           remote_user: ubuntu
           remote_key: ${{ secrets.EC2_KEY }}
 
-
-
       - name: executing remote ssh commands using password # TODO: 서버에 접속하여 Docker image pull 및 컨테이너 시작
         uses: appleboy/ssh-action@master
         with:
@@ -67,6 +65,8 @@ jobs:
           username: ubuntu
           key: ${{ secrets.EC2_KEY }}
           script: |
+            cd /home/ubuntu/srv/ubuntu
+            
             docker stop $(docker ps -a -q)         
             
             export DB_HOST=${{ secrets.DB_HOST }}
