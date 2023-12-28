@@ -9,11 +9,11 @@ services:
       - "8000:8000"
     environment:
       RDB: postgresql+asyncpg
-      DB_HOST: host.docker.internal
+      DB_HOST: ${DB_HOST}
       DB_PORT: 5432
       DB_NAME: glosseum-dev
-      DB_USER: junseokang
-      DB_PASSWORD:
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
     networks:
       - default
 
