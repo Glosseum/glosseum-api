@@ -10,8 +10,8 @@ services:
     environment:
       RDB: postgresql+asyncpg
       DB_HOST: ${DB_HOST}
-      DB_PORT: 5432
-      DB_NAME: glosseum-dev
+      DB_PORT: ${DB_PORT}
+      DB: ${DB}
       DB_USER: ${DB_USER}
       DB_PASSWORD: ${DB_PASSWORD}
     networks:
