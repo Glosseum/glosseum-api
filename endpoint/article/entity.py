@@ -10,6 +10,7 @@ class ArticleCreate(BaseModel):
 
 
 class ArticleAppend(BaseModel):
+    id: int
     logic: str = "AGREE"
     name: str
     content: str

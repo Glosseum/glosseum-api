@@ -1,5 +1,5 @@
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, delete, update
+from sqlalchemy import select, delete, update, insert
 from data.db.database import Transactional
 from data.db.models import Board, User
 
@@ -42,13 +42,19 @@ async def get_boards(per_page: int, page: int, session: AsyncSession = None) -> 
 
 
 @Transactional()
-async def create_board(board_req: dict, session: AsyncSession = None) -> None:
+async def create_board(board_req: dict, session: AsyncSession = None) -> Board:
     _board = Board(**board_req)
 
-    session.add(_board)
+    stmt = (
+        insert(Board)
+    )
+
+    res = await session.execute(stmt)
 
     await session.commit()
     await session.refresh(_board)
+
+    return res
 
 
 @Transactional()
