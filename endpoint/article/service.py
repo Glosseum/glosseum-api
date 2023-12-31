@@ -19,7 +19,7 @@ async def create_article(name: str, content: str, board_id: int, user_id: int) -
                 "board_id": board_id,
                 "creator_id": user_id,
                 "path": "",
-                "path_logical": "ROOT"
+                "path_logical": "ROOT",
             }
         )
     except IntegrityError as e:
@@ -30,8 +30,14 @@ async def create_article(name: str, content: str, board_id: int, user_id: int) -
             raise HTTPException(status_code=500, detail=f"Unknown DB Error: {e.orig}")
 
 
-async def append_article(prev_article_id: int, name: str, content: str, logic: str, board_id: int, user_id: int) \
-        -> None:
+async def append_article(
+    prev_article_id: int,
+    name: str,
+    content: str,
+    logic: str,
+    board_id: int,
+    user_id: int,
+) -> None:
     prev_article: Article = await repo.get_article(prev_article_id)
     if not prev_article:
         raise HTTPException(status_code=400, detail="존재하지 않는 게시글입니다.")
@@ -44,7 +50,7 @@ async def append_article(prev_article_id: int, name: str, content: str, logic: s
                 "board_id": board_id,
                 "creator_id": user_id,
                 "path": prev_article.path,
-                "path_logical": prev_article.path_logical + f"/{logic}"
+                "path_logical": prev_article.path_logical + f"/{logic}",
             }
         )
     except IntegrityError as e:
@@ -95,11 +101,7 @@ async def update_article(article_id: int, name: str, content: str, user_id: int)
         raise HTTPException(status_code=401, detail="권한이 없습니다.")
 
     await repo.update_article(
-        article_id=original_article.id,
-        article_req={
-            "name": name,
-            "content": content
-        }
+        article_id=original_article.id, article_req={"name": name, "content": content}
     )
 
 

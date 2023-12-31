@@ -22,7 +22,9 @@ async def create_user(user_req: dict, session: AsyncSession = None) -> None:
 
 
 @Transactional()
-async def update_user(username: str, user_req: dict, session: AsyncSession = None) -> None:
+async def update_user(
+    username: str, user_req: dict, session: AsyncSession = None
+) -> None:
     stmt = update(User).where(User.username == username).values(**user_req)
     await session.execute(stmt)
 

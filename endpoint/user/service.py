@@ -12,11 +12,13 @@ from data.db.models import User
 from config import CREDENTIAL_SECRET_KEY, CREDENTIAL_ALGORITHM
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-ACCESS_TOKEN_EXPIRE_MINUTES = 60*24
+ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/user/login")
 
 
-async def register_user(username: str, email: str, password1: str, password2: str) -> None:
+async def register_user(
+    username: str, email: str, password1: str, password2: str
+) -> None:
     if password1 != password2:
         raise HTTPException(status_code=400, detail="비밀번호가 일치하지 않습니다.")
 
@@ -25,7 +27,7 @@ async def register_user(username: str, email: str, password1: str, password2: st
             {
                 "username": username,
                 "email": email,
-                "password": pwd_context.hash(password1)
+                "password": pwd_context.hash(password1),
             }
         )
 
@@ -34,7 +36,9 @@ async def register_user(username: str, email: str, password1: str, password2: st
         if code == 23505:
             raise HTTPException(status_code=400, detail="Existing Username or Email.")
         else:
-            raise HTTPException(status_code=500, detail=f"Unknown Error. {e.orig.pgcode}: {e.orig}")
+            raise HTTPException(
+                status_code=500, detail=f"Unknown Error. {e.orig.pgcode}: {e.orig}"
+            )
 
 
 async def get_user_by_username(username: str) -> User:
@@ -45,7 +49,9 @@ async def get_user_by_username(username: str) -> User:
         if code == 23503:
             raise HTTPException(status_code=400, detail="User ID Not Found.")
         else:
-            raise HTTPException(status_code=500, detail=f"Unknown Error. {e.orig.pgcode}: {e.orig}")
+            raise HTTPException(
+                status_code=500, detail=f"Unknown Error. {e.orig.pgcode}: {e.orig}"
+            )
     return user
 
 
@@ -61,9 +67,11 @@ async def verify_user(username, password) -> str:
 
     payload = {
         "sub": username,
-        "exp": datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+        "exp": datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES),
     }
-    access_token = jwt.encode(payload, CREDENTIAL_SECRET_KEY, algorithm=CREDENTIAL_ALGORITHM)
+    access_token = jwt.encode(
+        payload, CREDENTIAL_SECRET_KEY, algorithm=CREDENTIAL_ALGORITHM
+    )
 
     return access_token
 
@@ -76,7 +84,9 @@ async def get_current_user(token: str = Depends(oauth2_scheme)) -> User:
     )
 
     try:
-        payload = jwt.decode(token, CREDENTIAL_SECRET_KEY, algorithms=[CREDENTIAL_ALGORITHM])
+        payload = jwt.decode(
+            token, CREDENTIAL_SECRET_KEY, algorithms=[CREDENTIAL_ALGORITHM]
+        )
         username: str = payload.get("sub")
         if username is None:
             raise credentials_exception
@@ -91,14 +101,13 @@ async def get_current_user(token: str = Depends(oauth2_scheme)) -> User:
         return user
 
 
-async def update_current_user(username_original: str, username_to_update: str, email_to_update: str) -> None:
+async def update_current_user(
+    username_original: str, username_to_update: str, email_to_update: str
+) -> None:
     try:
         await update_user(
             username=username_original,
-            user_req={
-                "username": username_to_update,
-                "email": email_to_update
-            }
+            user_req={"username": username_to_update, "email": email_to_update},
         )
     except IntegrityError as e:
         code: int = int(e.orig.pgcode)
@@ -107,7 +116,9 @@ async def update_current_user(username_original: str, username_to_update: str, e
         elif code == 23503:
             raise HTTPException(status_code=400, detail="User ID Not Found.")
         else:
-            raise HTTPException(status_code=500, detail=f"Unknown Error. {e.orig.pgcode}: {e.orig}")
+            raise HTTPException(
+                status_code=500, detail=f"Unknown Error. {e.orig.pgcode}: {e.orig}"
+            )
 
 
 async def delete_current_user(username: str) -> None:
@@ -118,4 +129,6 @@ async def delete_current_user(username: str) -> None:
         if code == 23503:
             raise HTTPException(status_code=400, detail="User ID Not Found.")
         else:
-            raise HTTPException(status_code=500, detail=f"Unknown Error. {e.orig.pgcode}: {e.orig}")
+            raise HTTPException(
+                status_code=500, detail=f"Unknown Error. {e.orig.pgcode}: {e.orig}"
+            )

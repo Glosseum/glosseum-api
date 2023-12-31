@@ -18,10 +18,7 @@ async def create_comment(comment_req: dict, session: AsyncSession = None) -> Com
 
 @Transactional()
 async def get_comment(comment_id: int, session: AsyncSession = None) -> Comment:
-    stmt = (
-        select(Comment)
-        .where(Comment.id == comment_id)
-    )
+    stmt = select(Comment).where(Comment.id == comment_id)
 
     res = await session.execute(stmt)
 
@@ -29,7 +26,9 @@ async def get_comment(comment_id: int, session: AsyncSession = None) -> Comment:
 
 
 @Transactional()
-async def get_comments_from_article(article_id: int, session: AsyncSession = None) -> list[Comment]:
+async def get_comments_from_article(
+    article_id: int, session: AsyncSession = None
+) -> list[Comment]:
     stmt = (
         select(Comment)
         .where(Comment.article_id == article_id)
@@ -41,11 +40,10 @@ async def get_comments_from_article(article_id: int, session: AsyncSession = Non
 
 
 @Transactional()
-async def update_comment(comment_id: int, comment_req: dict, session: AsyncSession = None) -> None:
-    stmt = (
-        update(Comment)
-        .where(Comment.id == comment_id).values(**comment_req)
-    )
+async def update_comment(
+    comment_id: int, comment_req: dict, session: AsyncSession = None
+) -> None:
+    stmt = update(Comment).where(Comment.id == comment_id).values(**comment_req)
     await session.execute(stmt)
 
     return await get_comment(comment_id)
