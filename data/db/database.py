@@ -6,6 +6,7 @@ from config import DB_CONFIG
 
 
 SQLALCHEMY_DATABASE_URL = f"{DB_CONFIG['rdb']}://{DB_CONFIG['db_user']}:{DB_CONFIG['db_password']}@{DB_CONFIG['host']}:{DB_CONFIG['port']}/{DB_CONFIG['db']}"
+# TODO: If in test situation, connect to test db..
 
 
 metadata = MetaData()
@@ -20,7 +21,7 @@ class Transactional:
     def __call__(self, func):
         @wraps(func)
         async def _transactional(*args, **kwargs):
-            async with async_session as session:
+            async with async_session() as session:
                 if kwargs.get("session"):
                     result = await func(*args, **kwargs)
                     await session.commit()
@@ -30,7 +31,6 @@ class Transactional:
                     result = await func(*args, **kwargs)
                     await session.commit()
                 except Exception as e:
-                    print(e)
                     # logger.exception(f"{type(e).__name__} : {str(e)}")
                     await session.rollback()
                     raise e
