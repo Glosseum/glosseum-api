@@ -14,9 +14,9 @@ from endpoint.user.service import get_current_user
 router = APIRouter(prefix="/board")
 
 
-@router.post("/", status_code=status.HTTP_204_NO_CONTENT)
+@router.post("/", response_model=BoardGet, status_code=status.HTTP_201_CREATED)
 async def create_board(_board_create: BoardCreate, user=Depends(get_current_user)):
-    await create_new_board(
+    return await create_new_board(
         board_name=_board_create.name,
         board_description=_board_create.description,
         user_id=user.id,

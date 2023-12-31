@@ -20,6 +20,7 @@ class UserUpdate(BaseModel):
 
 
 class UserGet(BaseModel):
+    id: int
     username: str
     email: str = "email@email.com"
 

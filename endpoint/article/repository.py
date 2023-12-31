@@ -1,5 +1,5 @@
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, delete, update, event
+from sqlalchemy import select, delete, update, event, insert
 from data.db.database import Transactional
 from data.db.models import Board, User, Article
 
@@ -28,17 +28,19 @@ async def get_articles_from_board(
 
 
 @Transactional()
-async def create_article(article_req: dict, session: AsyncSession = None) -> None:
+async def create_article(article_req: dict, session: AsyncSession = None) -> Article:
     _article = Article(**article_req)
 
-    session.add(_article)
-
+    stmt = insert(_article)
+    res = await session.execute(stmt)
     await session.commit()
 
     _article.path = _article.path + f"/{_article.id}"
-    await session.commit()
+    await session.commit()  # TODO: 2번 커밋보다 더 깔끔한 해결책을 찾자!
 
     await session.refresh(_article)
+
+    return res
 
 
 @Transactional()

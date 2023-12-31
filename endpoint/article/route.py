@@ -13,12 +13,9 @@ from endpoint.user.service import get_current_user
 router = APIRouter(prefix="/article")
 
 
-@router.post("/{board_id}", status_code=status.HTTP_204_NO_CONTENT)
-async def create_article(
-    board_id: int, _article_create: ArticleCreate, user=Depends(get_current_user)
-) -> None:
-    # TODO: 보드에 이미 게시글이 있으면 Create는 에러가 나야 함
-    await service.create_article(
+@router.post("/{board_id}", response_model=ArticleGet, status_code=status.HTTP_201_CREATED)
+async def create_article(board_id: int, _article_create: ArticleCreate, user=Depends(get_current_user)) -> ArticleGet:
+    return await service.create_article(
         name=_article_create.name,
         content=_article_create.content,
         board_id=board_id,

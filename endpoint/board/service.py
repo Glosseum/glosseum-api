@@ -38,17 +38,18 @@ async def get_board_list(per_page: int, page: int) -> list[Board]:
     return res
 
 
-async def create_new_board(
-    board_name: str, board_description: str, user_id: int
-) -> None:
+async def create_new_board(board_name: str, board_description: str, user_id: int) -> Board:
     try:
-        await create_board(
+        res = await create_board(
             {
                 "creator_id": user_id,
                 "name": board_name,
                 "description": board_description,
             }
         )
+
+        return res
+
     except IntegrityError as e:
         code: int = e.orig.pgcode
         if code == 23503:
@@ -57,9 +58,7 @@ async def create_new_board(
             raise HTTPException(status_code=500, detail=f"Unknown DB Error: {e.orig}")
 
 
-async def update_existing_board(
-    board_id: int, board_name: str, board_description: str, user_id: int
-):
+async def update_existing_board(board_id: int, board_name: str, board_description: str, user_id: int) -> None:
     original_board = await get_board(board_id)
     if not original_board.name:
         raise HTTPException(status_code=400, detail="존재하지 않는 게시판입니다.")
@@ -72,7 +71,7 @@ async def update_existing_board(
     )
 
 
-async def delete_existing_board(board_id: int, user_id: int):
+async def delete_existing_board(board_id: int, user_id: int) -> None:
     original_board = await get_board(board_id)
     if not original_board:
         raise HTTPException(status_code=400, detail="존재하지 않는 게시판입니다.")
