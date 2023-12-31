@@ -1,7 +1,7 @@
 from functools import wraps
 from sqlalchemy import create_engine, MetaData, event
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
+from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine, async_sessionmaker
 from config import DB_CONFIG
 
 
@@ -14,7 +14,7 @@ engine = create_async_engine(SQLALCHEMY_DATABASE_URL)
 
 Base = declarative_base()
 
-async_session = AsyncSession(bind=engine, expire_on_commit=False)
+async_session = async_sessionmaker(bind=engine, expire_on_commit=False)
 
 
 class Transactional:
@@ -29,7 +29,6 @@ class Transactional:
                 try:
                     kwargs["session"] = session
                     result = await func(*args, **kwargs)
-                    print(f"commit for {func.__name__}")
                     await session.commit()
                 except Exception as e:
                     # logger.exception(f"{type(e).__name__} : {str(e)}")

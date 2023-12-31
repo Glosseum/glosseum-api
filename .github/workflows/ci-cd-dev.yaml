@@ -74,6 +74,7 @@ jobs:
             export DB_PASSWORD=${{ secrets.DB_PASSWORD }}
             export DB_PORT=${{ secrets.DB_PORT }}
             export DB=${{ secrets.DB }}
+            
                         
             docker pull invalidid56/glosseum-dev:0.1
             
