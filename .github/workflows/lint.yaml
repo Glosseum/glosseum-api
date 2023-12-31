@@ -20,4 +20,4 @@ jobs:
       - name: Analysing the code with pylint
         run: |
           black --check $(git ls-files '*.py')
-          pylint $(git ls-files '*.py') || True
+          pylint $(git ls-files '*.py') || true
