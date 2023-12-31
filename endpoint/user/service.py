@@ -51,6 +51,7 @@ async def get_user_by_username(username: str) -> User:
 
 async def verify_user(username, password) -> str:
     user = await get_user_by_username(username)
+
     if not user or not pwd_context.verify(password, user.password):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -63,7 +64,6 @@ async def verify_user(username, password) -> str:
         "exp": datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     }
     access_token = jwt.encode(payload, CREDENTIAL_SECRET_KEY, algorithm=CREDENTIAL_ALGORITHM)
-    print(CREDENTIAL_ALGORITHM)
 
     return access_token
 

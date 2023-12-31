@@ -25,6 +25,7 @@ jobs:
   deploy:
     name: Deploy
     needs: build
+
     runs-on: ubuntu-latest
     steps:
       - name: checkout
@@ -74,6 +75,9 @@ jobs:
             export DB_PASSWORD=${{ secrets.DB_PASSWORD }}
             export DB_PORT=${{ secrets.DB_PORT }}
             export DB=${{ secrets.DB }}
+            
+            export CREDENTIAL_ALGORITHM=${{ secrets.CREDENTIAL_ALGORITHM }}
+            export CREDENTIAL_SECRET=${{ secrets.CREDENTIAL_SECRET }}
             
                         
             docker pull invalidid56/glosseum-dev:0.1
