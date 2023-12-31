@@ -1,13 +1,16 @@
 from fastapi import APIRouter, Depends, status
 
 import endpoint.article.service as service
-from endpoint.article.entity import ArticleCreate, ArticleAppend, ArticleUpdate, ArticleGet
+from endpoint.article.entity import (
+    ArticleCreate,
+    ArticleAppend,
+    ArticleUpdate,
+    ArticleGet,
+)
 from endpoint.user.service import get_current_user
 
 
-router = APIRouter(
-    prefix="/article"
-)
+router = APIRouter(prefix="/article")
 
 
 @router.post("/{board_id}", response_model=ArticleGet, status_code=status.HTTP_201_CREATED)
@@ -16,21 +19,24 @@ async def create_article(board_id: int, _article_create: ArticleCreate, user=Dep
         name=_article_create.name,
         content=_article_create.content,
         board_id=board_id,
-        user_id=user.id
+        user_id=user.id,
     )
 
 
 @router.post("/{board_id}/{prev_article_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def append_article(
-        board_id: int, prev_article_id: int, _article_append: ArticleAppend, user=Depends(get_current_user)
-    ) -> None:
+    board_id: int,
+    prev_article_id: int,
+    _article_append: ArticleAppend,
+    user=Depends(get_current_user),
+) -> None:
     await service.append_article(
         board_id=board_id,
         prev_article_id=prev_article_id,
         name=_article_append.name,
         content=_article_append.content,
         logic=_article_append.logic,
-        user_id=user.id
+        user_id=user.id,
     )
 
 
@@ -50,12 +56,14 @@ async def get_article_list(board_id: int) -> list[ArticleGet]:
 
 
 @router.put("/{article_id}", status_code=status.HTTP_204_NO_CONTENT)
-async def update_article(article_id: int, _article_update: ArticleUpdate, user=Depends(get_current_user)) -> None:
+async def update_article(
+    article_id: int, _article_update: ArticleUpdate, user=Depends(get_current_user)
+) -> None:
     await service.update_article(
         article_id=article_id,
         name=_article_update.name,
         content=_article_update.content,
-        user_id=user.id
+        user_id=user.id,
     )
 
 

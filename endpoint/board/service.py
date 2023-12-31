@@ -1,7 +1,13 @@
 from fastapi import HTTPException
 from sqlalchemy.exc import IntegrityError
 
-from endpoint.board.repository import get_board, create_board, update_board, delete_board, get_boards
+from endpoint.board.repository import (
+    get_board,
+    create_board,
+    update_board,
+    delete_board,
+    get_boards,
+)
 from data.db.models import Board
 
 
@@ -38,7 +44,7 @@ async def create_new_board(board_name: str, board_description: str, user_id: int
             {
                 "creator_id": user_id,
                 "name": board_name,
-                "description": board_description
+                "description": board_description,
             }
         )
 
@@ -61,10 +67,7 @@ async def update_existing_board(board_id: int, board_name: str, board_descriptio
 
     await update_board(
         board_id=original_board.id,
-        board_req={
-            "name": board_name,
-            "description": board_description
-        }
+        board_req={"name": board_name, "description": board_description},
     )
 
 

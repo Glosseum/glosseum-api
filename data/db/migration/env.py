@@ -13,12 +13,10 @@ from config import DB_CONFIG
 
 config = context.config
 
-if not DB_CONFIG['rdb'].startswith('sqlite'):
-    SQLALCHEMY_DATABASE_URL =\
-        f"{DB_CONFIG['rdb']}://{DB_CONFIG['db_user']}:{DB_CONFIG['db_password']}@{DB_CONFIG['host']}:{DB_CONFIG['port']}/{DB_CONFIG['db']}"
+if not DB_CONFIG["rdb"].startswith("sqlite"):
+    SQLALCHEMY_DATABASE_URL = f"{DB_CONFIG['rdb']}://{DB_CONFIG['db_user']}:{DB_CONFIG['db_password']}@{DB_CONFIG['host']}:{DB_CONFIG['port']}/{DB_CONFIG['db']}"
 else:
-    SQLALCHEMY_DATABASE_URL =\
-        f"{DB_CONFIG['rdb']}:///./{DB_CONFIG['db']}"
+    SQLALCHEMY_DATABASE_URL = f"{DB_CONFIG['rdb']}:///./{DB_CONFIG['db']}"
 
 
 if not config.get_main_option("sqlalchemy.url"):
@@ -35,6 +33,7 @@ if config.config_file_name is not None:
 # target_metadata = mymodel.Base.metadata
 
 from data.db.models import Base
+
 target_metadata = Base.metadata
 
 # other values from the config, defined by the needs of env.py,

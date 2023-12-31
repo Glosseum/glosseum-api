@@ -5,17 +5,15 @@ import endpoint.comment.repository as repo
 from data.db.models import Board, User, Article, Comment
 
 
-async def create_new_comment(content: str, article_id: int, user_id: int) -> Comment | None:
+async def create_new_comment(
+    content: str, article_id: int, user_id: int
+) -> Comment | None:
     if len(content) >= 100:
         raise HTTPException(status_code=400, detail="댓글은 100자 이내여야 합니다.")
 
     try:
         res = await repo.create_comment(
-            {
-                "content": content,
-                "article_id": article_id,
-                "creator_id": user_id
-            }
+            {"content": content, "article_id": article_id, "creator_id": user_id}
         )
         return res
     except IntegrityError as e:
@@ -62,10 +60,7 @@ async def update_comment(comment_id: int, content: str, user_id: int) -> None:
         raise HTTPException(status_code=401, detail="권한이 없습니다.")
 
     await repo.update_comment(
-        comment_id=original_comment.id,
-        comment_req={
-            "content": content
-        }
+        comment_id=original_comment.id, comment_req={"content": content}
     )
 
 
