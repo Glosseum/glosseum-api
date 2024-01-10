@@ -6,6 +6,7 @@
 from enum import Enum
 from pydantic import BaseModel, constr, ValidationError, field_validator
 
+
 class ArticleLogic(str, Enum):
     """
     장작에 찬성, 반대, 중립의 반응(로직)을 남길 수 있습니다.

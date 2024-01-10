@@ -1,5 +1,5 @@
 """
-데이터베이스와 실질적으로 상호작용하는 모듈입니다.
+장작과 관련하여 데이터베이스와 실질적으로 상호작용하는 모듈입니다.
 불판 : Board, 장작 : Article
 """
 
@@ -74,6 +74,9 @@ async def update_article(
 
 @Transactional()
 async def delete_article(article_id: int, session: AsyncSession = None) -> None:
+    """
+    장작을 삭제합니다.
+    """
     stmt = delete(Article).where(Article.id == article_id)
     await session.execute(stmt)
 
@@ -82,5 +85,8 @@ async def delete_article(article_id: int, session: AsyncSession = None) -> None:
 async def update_article_path(
     article_id: int, path: str, session: AsyncSession = None
 ) -> None:
+    """
+    장작의 경로를 수정합니다.
+    """
     stmt = update(Article).where(Article.id == article_id).values(path=path)
     await session.execute(stmt)
