@@ -1,3 +1,7 @@
+"""
+.env 파일로 부터 각종 데이터베이스 인증 정보와 암호화에 필요한 정보를 불러옵니다.
+"""
+
 import os
 from dotenv import load_dotenv
 

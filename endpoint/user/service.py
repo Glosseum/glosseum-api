@@ -1,3 +1,7 @@
+"""
+유저와 관련된 작업을 수행할 때, 구체적인 동작을 정의합니다.
+"""
+
 from datetime import datetime, timedelta
 
 from jose import jwt, JWTError
@@ -19,6 +23,10 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/user/login")
 async def register_user(
     username: str, email: str, password1: str, password2: str
 ) -> None:
+    """
+    회원가입 할때의 구체적인 동작을 정의합니다.
+    두 password의 일치를 확인한 다음, 이미 존재하는 사용자명이나 이메일이 있는지 확인합니다.
+    """
     if password1 != password2:
         raise HTTPException(status_code=400, detail="비밀번호가 일치하지 않습니다.")
 
@@ -34,28 +42,35 @@ async def register_user(
     except IntegrityError as e:
         code: int = int(e.orig.pgcode)
         if code == 23505:
-            raise HTTPException(status_code=400, detail="Existing Username or Email.")
-        else:
             raise HTTPException(
-                status_code=500, detail=f"Unknown Error. {e.orig.pgcode}: {e.orig}"
-            )
+                status_code=400, detail="Existing Username or Email."
+            ) from e
+        raise HTTPException(
+            status_code=500, detail=f"Unknown Error. {e.orig.pgcode}: {e.orig}"
+        ) from e
 
 
 async def get_user_by_username(username: str) -> User:
+    """
+    username으로 유저를 조회할 때의 구체적인 동작을 정의합니다.
+    """
     try:
         user = await get_user(username)
     except IntegrityError as e:
         code: int = int(e.orig.pgcode)
         if code == 23503:
-            raise HTTPException(status_code=400, detail="User ID Not Found.")
-        else:
-            raise HTTPException(
-                status_code=500, detail=f"Unknown Error. {e.orig.pgcode}: {e.orig}"
-            )
+            raise HTTPException(status_code=400, detail="User ID Not Found.") from e
+        raise HTTPException(
+            status_code=500, detail=f"Unknown Error. {e.orig.pgcode}: {e.orig}"
+        ) from e
     return user
 
 
 async def verify_user(username, password) -> str:
+    """
+    유저가 실제로 존재하는지 검증하는 과정의 구체적인 동작을 정의합니다.
+    존재하면 jwt 토큰을 생성하여 반환합니다.
+    """
     user = await get_user_by_username(username)
 
     if not user or not pwd_context.verify(password, user.password):
@@ -77,6 +92,9 @@ async def verify_user(username, password) -> str:
 
 
 async def get_current_user(token: str = Depends(oauth2_scheme)) -> User:
+    """
+    현재 로그인한 유저의 정보를 jwt 토큰을 바탕으로 불러옵니다.
+    """
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
@@ -90,20 +108,22 @@ async def get_current_user(token: str = Depends(oauth2_scheme)) -> User:
         username: str = payload.get("sub")
         if username is None:
             raise credentials_exception
-    except JWTError:
+    except JWTError as e:
+        raise credentials_exception from e
+
+    user = await get_user_by_username(username)
+    if user is None:
         raise credentials_exception
 
-    else:
-        user = await get_user_by_username(username)
-        if user is None:
-            raise credentials_exception
-
-        return user
+    return user
 
 
 async def update_current_user(
     username_original: str, username_to_update: str, email_to_update: str
 ) -> None:
+    """
+    현재 존재하는 유저의 정보를 수정할 때의 구체적인 동작을 정의합니다.
+    """
     try:
         await update_user(
             username=username_original,
@@ -112,23 +132,26 @@ async def update_current_user(
     except IntegrityError as e:
         code: int = int(e.orig.pgcode)
         if code == 23505:
-            raise HTTPException(status_code=400, detail="Existing Username or Email.")
-        elif code == 23503:
-            raise HTTPException(status_code=400, detail="User ID Not Found.")
-        else:
             raise HTTPException(
-                status_code=500, detail=f"Unknown Error. {e.orig.pgcode}: {e.orig}"
-            )
+                status_code=400, detail="Existing Username or Email."
+            ) from e
+        if code == 23503:
+            raise HTTPException(status_code=400, detail="User ID Not Found.") from e
+        raise HTTPException(
+            status_code=500, detail=f"Unknown Error. {e.orig.pgcode}: {e.orig}"
+        ) from e
 
 
 async def delete_current_user(username: str) -> None:
+    """
+    현재 존재하는 유저를 삭제할 때의 구체적인 동작을 정의합니다.
+    """
     try:
         await delete_user(username)
     except IntegrityError as e:
         code: int = int(e.orig.pgcode)
         if code == 23503:
-            raise HTTPException(status_code=400, detail="User ID Not Found.")
-        else:
-            raise HTTPException(
-                status_code=500, detail=f"Unknown Error. {e.orig.pgcode}: {e.orig}"
-            )
+            raise HTTPException(status_code=400, detail="User ID Not Found.") from e
+        raise HTTPException(
+            status_code=500, detail=f"Unknown Error. {e.orig.pgcode}: {e.orig}"
+        ) from e
