@@ -14,3 +14,5 @@ DB_CONFIG = {
     "port": os.getenv("DB_PORT", "5432"),
     "db": os.getenv("DB", ""),
 }
+
+SITE_ENV = os.getenv("SITE_ENV", "test")

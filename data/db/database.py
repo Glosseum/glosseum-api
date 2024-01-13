@@ -2,11 +2,13 @@ from functools import wraps
 from sqlalchemy import create_engine, MetaData, event
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine, async_sessionmaker
-from config import DB_CONFIG
+from config import DB_CONFIG, SITE_ENV
 
 
 SQLALCHEMY_DATABASE_URL = f"{DB_CONFIG['rdb']}://{DB_CONFIG['db_user']}:{DB_CONFIG['db_password']}@{DB_CONFIG['host']}:{DB_CONFIG['port']}/{DB_CONFIG['db']}"
-# TODO: If in test situation, connect to test db..
+if SITE_ENV == "test":
+    SQLALCHEMY_DATABASE_URL = "sqlite:///:memory:"
+    # TODO: local postgresql db를 사용하는 편이 나을 것 같다
 
 
 metadata = MetaData()
