@@ -18,7 +18,7 @@ from endpoint.user.repository import User
 router = APIRouter(prefix="/user")
 
 
-@router.post("/register", status_code=status.HTTP_204_NO_CONTENT)
+@router.post("/register", status_code=status.HTTP_204_NO_CONTENT, tags=["User"])
 async def register(_user_create: UserCreate):
     """
     유저를 생성(회원가입)할 때의 라우팅 경로를 정의합니다.
@@ -31,7 +31,7 @@ async def register(_user_create: UserCreate):
     )
 
 
-@router.post("/login", response_model=Token)
+@router.post("/login", response_model=Token, tags=["User"])
 async def login(form_data: OAuth2PasswordRequestForm = Depends()):
     """
     로그인 할때의 라우팅 경로를 정의합니다.
@@ -46,7 +46,7 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
     }
 
 
-@router.get("/me", response_model=UserGet)
+@router.get("/me", response_model=UserGet, tags=["User"])
 async def get_user_me(user: User = Depends(get_current_user)) -> UserGet:
     """
     로그인한 유저의 정보를 반환합니다.
@@ -54,7 +54,7 @@ async def get_user_me(user: User = Depends(get_current_user)) -> UserGet:
     return user  # 추후 작성 게시글 모아 보기 등도 추가..
 
 
-@router.put("/{username}")
+@router.put("/{username}", tags=["User"])
 async def update_user(
     _user_update: UserUpdate, user: User = Depends(get_current_user)
 ) -> None:
@@ -68,7 +68,7 @@ async def update_user(
     )
 
 
-@router.delete("/{username}")
+@router.delete("/{username}", tags=["User"])
 async def delete_user(user: User = Depends(get_current_user)) -> None:
     """
     유저를 삭제할 때의 라우팅 경로를 정의합니다.

@@ -83,16 +83,16 @@ class ArticleGet(BaseModel):
     path: str
     path_logical: constr(to_upper=True)
 
-    @field_validator("path_logical")
-    def path_logical_validator(self, logic: str):
-        """
-        반응(로직)이 ArticleLogic의 3개 멤버중 하나에 속하는지 검증합니다.
-        """
+    # @field_validator("path_logical")
+    # def path_logical_validator(self, logic: str):
+    #     """
+    #     반응(로직)이 ArticleLogic의 3개 멤버중 하나에 속하는지 검증합니다.
+    #     """
 
-        for _logic in logic.split("/"):
-            if _logic not in ArticleLogic.__members__:
-                raise ValidationError(f"{logic}는 잘못된 경로입니다.")
-        return logic
+    #     for _logic in logic.split("/"):
+    #         if _logic not in ArticleLogic.__members__:
+    #             raise ValidationError(f"{logic}는 잘못된 경로입니다.")
+    #     return logic
 
     class Config:
         """
