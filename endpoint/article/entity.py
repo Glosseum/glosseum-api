@@ -16,6 +16,8 @@ class ArticleLogic(str, Enum):
     DISAGREE = "DISAGREE"
     NEUTRAL = "NEUTRAL"
 
+    def __str__(self):
+        return str(self.value)
 
 class ArticleCreate(BaseModel):
     """
