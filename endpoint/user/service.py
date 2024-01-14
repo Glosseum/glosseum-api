@@ -17,52 +17,57 @@ from config import CREDENTIAL_SECRET_KEY, CREDENTIAL_ALGORITHM, UNIVCERT_API_KEY
 
 import requests
 
+import aiohttp
+
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/user/login")
 
 univcert_url = "https://univcert.com/api/v1/"
 
+async def fetch(url, json):
+    async with aiohttp.ClientSession() as session:
+        async with session.post(url, json=json) as response:
+            return await response.json()
+
 
 async def verify_univ(email: str) -> None:
     """
     유저의 대학교 이메일에 인증 코드를 전송할 때의 구체적인 동작을 정의합니다.
     """
+    result = await fetch(
+        univcert_url + "certify",{
+        "key": UNIVCERT_API_KEY,
+        "email": email,
+        "univName": "서울대학교",
+        "univ_check": True,
+        })
 
-    response = requests.post(
-        univcert_url + "certify",
-        json={
-            "key": UNIVCERT_API_KEY,
-            "email": email,
-            "univName": "서울대학교",
-            "univ_check": True,
-        },
-    )
-    if response.json()["success"] == False:
-        raise HTTPException(status_code=400, detail=response.json()["message"])
+    if result["success"] == False:
+        raise HTTPException(status_code=400, detail=result["message"])
 
 
 async def register_user(
-    username: str, email: str, code: int, password1: str, password2: str
+    username: str, email: str, verification_code: int, password1: str, password2: str
 ) -> None:
     """
     회원가입 할때의 구체적인 동작을 정의합니다.
     먼저 인증 코드가 유효한지 검증하고, 두 password의 일치를 확인한 다음, 이미 존재하는 사용자명이나 이메일이 있는지 확인합니다.
     """
-    response = requests.post(
-        univcert_url + "certifycode",
-        json={
-            "key": UNIVCERT_API_KEY,
-            "email": email,
-            "univName": "서울대학교",
-            "code": code,
-        },
-    )
-    if response.json()["success"] == False:
-        raise HTTPException(status_code=400, detail=response.json()["message"])
 
     if password1 != password2:
         raise HTTPException(status_code=400, detail="비밀번호가 일치하지 않습니다.")
+
+    result = await fetch(
+        univcert_url + "certifycode",{
+            "key": UNIVCERT_API_KEY,
+            "email": email,
+            "univName": "서울대학교",
+            "code": verification_code,
+        },
+    )
+    if result["success"] == False:
+        raise HTTPException(status_code=400, detail=result["message"])
 
     try:
         await create_user(
@@ -74,6 +79,10 @@ async def register_user(
         )
 
     except IntegrityError as e:
+        await fetch(
+            univcert_url + "clear/" + email,{
+                "key": UNIVCERT_API_KEY
+                })
         code: int = int(e.orig.pgcode)
         if code == 23505:
             raise HTTPException(
@@ -183,9 +192,10 @@ async def delete_current_user(username: str) -> None:
     """
     try:
         user = await get_user_by_username(username)
-        requests.post(
-            univcert_url + "clear/" + user.email, json={"key": UNIVCERT_API_KEY}
-        )
+        await fetch(
+            univcert_url + "clear/" + user.email,{
+                "key": UNIVCERT_API_KEY
+                })
         await delete_user(username)
     except IntegrityError as e:
         code: int = int(e.orig.pgcode)

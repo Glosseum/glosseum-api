@@ -35,7 +35,7 @@ async def register(_user_create: UserCreate):
     await register_user(
         _user_create.username,
         _user_create.email,
-        _user_create.code,
+        _user_create.verification_code,
         _user_create.password1,
         _user_create.password2,
     )

@@ -19,7 +19,7 @@ class Board(Base):
     name = Column(String, index=True)
     description = Column(String)
 
-    creator_id = Column(Integer, ForeignKey("user.id"))
+    creator_id = Column(Integer, ForeignKey("user.id", onupdate="CASCADE", ondelete="CASCADE"))
     creator = relationship("User", backref="boards")
 
 
@@ -30,10 +30,10 @@ class Article(Base):
     name = Column(String, index=True)
     content = Column(String)
 
-    creator_id = Column(Integer, ForeignKey("user.id"))
+    creator_id = Column(Integer, ForeignKey("user.id", onupdate="CASCADE", ondelete="CASCADE"))
     creator = relationship("User", backref="articles")
 
-    board_id = Column(Integer, ForeignKey("board.id"))
+    board_id = Column(Integer, ForeignKey("board.id", onupdate="CASCADE", ondelete="CASCADE"))
     board = relationship("Board", backref="articles")
 
     # Article 간 트리 구조를 구현하기 위해 Path Enumeration 디자인 패턴 사용 (보드 조회 시 모든 아티클 조회하므로 순환 연산의 부담이 없음)
@@ -51,8 +51,8 @@ class Comment(Base):
 
     content = Column(String)
 
-    creator_id = Column(Integer, ForeignKey("user.id"))
+    creator_id = Column(Integer, ForeignKey("user.id", onupdate="CASCADE", ondelete="CASCADE"))
     creator = relationship("User", backref="comments")
 
-    article_id = Column(Integer, ForeignKey("article.id"))
+    article_id = Column(Integer, ForeignKey("article.id", onupdate="CASCADE", ondelete="CASCADE"))
     article = relationship("Article", backref="comments")

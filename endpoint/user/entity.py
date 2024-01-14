@@ -27,7 +27,7 @@ class UserCreate(BaseModel):
 
     username: str
     email: str = "email@email.com"
-    code: int
+    verification_code: int
     password1: str
     password2: str
 
