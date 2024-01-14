@@ -14,6 +14,10 @@ jobs:
         with:
           python-version: 3.11
 
+      - name: Install dependencies
+        run: |
+          docker build -t glosseum-dev:0.1 .
+
       - name: Test
         run: |
           export SITE_ENV=test
