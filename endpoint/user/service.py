@@ -25,6 +25,7 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/user/login")
 
 univcert_url = "https://univcert.com/api/v1/"
 
+
 async def fetch(url, json):
     async with aiohttp.ClientSession() as session:
         async with session.post(url, json=json) as response:
@@ -36,12 +37,14 @@ async def verify_univ(email: str) -> None:
     유저의 대학교 이메일에 인증 코드를 전송할 때의 구체적인 동작을 정의합니다.
     """
     result = await fetch(
-        univcert_url + "certify",{
-        "key": UNIVCERT_API_KEY,
-        "email": email,
-        "univName": "서울대학교",
-        "univ_check": True,
-        })
+        univcert_url + "certify",
+        {
+            "key": UNIVCERT_API_KEY,
+            "email": email,
+            "univName": "서울대학교",
+            "univ_check": True,
+        },
+    )
 
     if result["success"] == False:
         raise HTTPException(status_code=400, detail=result["message"])
@@ -59,7 +62,8 @@ async def register_user(
         raise HTTPException(status_code=400, detail="비밀번호가 일치하지 않습니다.")
 
     result = await fetch(
-        univcert_url + "certifycode",{
+        univcert_url + "certifycode",
+        {
             "key": UNIVCERT_API_KEY,
             "email": email,
             "univName": "서울대학교",
@@ -79,10 +83,7 @@ async def register_user(
         )
 
     except IntegrityError as e:
-        await fetch(
-            univcert_url + "clear/" + email,{
-                "key": UNIVCERT_API_KEY
-                })
+        await fetch(univcert_url + "clear/" + email, {"key": UNIVCERT_API_KEY})
         code: int = int(e.orig.pgcode)
         if code == 23505:
             raise HTTPException(
@@ -192,10 +193,7 @@ async def delete_current_user(username: str) -> None:
     """
     try:
         user = await get_user_by_username(username)
-        await fetch(
-            univcert_url + "clear/" + user.email,{
-                "key": UNIVCERT_API_KEY
-                })
+        await fetch(univcert_url + "clear/" + user.email, {"key": UNIVCERT_API_KEY})
         await delete_user(username)
     except IntegrityError as e:
         code: int = int(e.orig.pgcode)
