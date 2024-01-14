@@ -53,7 +53,7 @@ jobs:
       - name: copy source via ssh key # ssh key를 이용해 현재 푸시된 소스를 서버에 복사한다.
         uses: burnett01/rsync-deployments@4.1
         with:
-          switches: -avzr --delete
+          switches: -avzr --delete --inplace
           remote_path: /home/ubuntu/srv/ubuntu/
           remote_host: ${{ secrets.EC2_HOST }}
           remote_user: ubuntu
