@@ -19,6 +19,7 @@ class ArticleLogic(str, Enum):
     def __str__(self):
         return str(self.value)
 
+
 class ArticleCreate(BaseModel):
     """
     장작을 처음 생성할 때 입력받는 정보입니다.
