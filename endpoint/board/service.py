@@ -62,7 +62,7 @@ async def create_new_board(
                 "name": board_name,
                 "description": board_description,
                 "creator_id": user_id,
-                "creator": user
+                "creator": user,
             }
         )
 

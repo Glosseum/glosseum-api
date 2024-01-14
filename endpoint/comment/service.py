@@ -10,6 +10,7 @@ from data.db.models import Article, Comment
 
 from endpoint.article.service import get_article_by_id
 
+
 async def create_new_comment(
     content: str, article_id: int, user_id: int
 ) -> Comment | None:
