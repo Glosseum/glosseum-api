@@ -6,8 +6,31 @@ from endpoint.board.route import router as board_router
 from endpoint.article.route import router as article_router
 from endpoint.comment.route import router as comment_router
 
+tags_metadata = [
+    {
+        "name": "User",
+        "description": "유저와 관련된 API 엔드포인트를 정의합니다.",
+    },
+    {
+        "name": "Board",
+        "description": "불판과 관련된 API 엔드포인트를 정의합니다.",
+    },
+    {
+        "name": "Article",
+        "description": "장작과 관련된 API 엔드포인트를 정의합니다.",
+    },
+    {
+        "name": "Comment",
+        "description": "댓글과 관련된 API 엔드포인트를 정의합니다.",
+    },
+]
 
-app = FastAPI()
+
+app = FastAPI(
+    title="Gloseum API Server",
+    summary="글로세움 서비스의 API 서버입니다.",
+    openapi_tags=tags_metadata,
+)
 
 app.add_middleware(
     CORSMiddleware,
