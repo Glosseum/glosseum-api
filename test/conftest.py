@@ -1,3 +1,5 @@
+import os
+
 import httpx
 import pytest
 import asyncio
@@ -11,8 +13,6 @@ from fastapi import FastAPI
 from main import app
 from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine, AsyncSession
 
-from alembic.command import upgrade as alembic_upgrade
-from alembic.config import Config as AlembicConfig
 
 from data.db import database
 from data.db.models import User, Base
@@ -29,10 +29,14 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24
 
 @pytest_asyncio.fixture(scope="session")
 def event_loop():
-    loop = asyncio.new_event_loop()
-    asyncio.set_event_loop(loop)
-    yield loop
-    loop.close()
+    try:
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        yield loop
+    finally:
+        loop.close()
+        print("Ends Here")
+        os.remove("test.db")
 
 
 @pytest_asyncio.fixture

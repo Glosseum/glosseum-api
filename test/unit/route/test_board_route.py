@@ -21,4 +21,6 @@ async def test_post_board(test_client: AsyncClient, test_headers: dict):
         headers=test_headers,
     )
 
+    print(response.content)
+
     assert response.status_code == status.HTTP_204_NO_CONTENT
