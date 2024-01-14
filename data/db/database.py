@@ -7,7 +7,7 @@ from config import DB_CONFIG, SITE_ENV
 
 SQLALCHEMY_DATABASE_URL = f"{DB_CONFIG['rdb']}://{DB_CONFIG['db_user']}:{DB_CONFIG['db_password']}@{DB_CONFIG['host']}:{DB_CONFIG['port']}/{DB_CONFIG['db']}"
 if SITE_ENV == "test":
-    SQLALCHEMY_DATABASE_URL = "sqlite:///:memory:"
+    SQLALCHEMY_DATABASE_URL = "sqlite+aiosqlite:///test.db"
     # TODO: local postgresql db를 사용하는 편이 나을 것 같다
 
 

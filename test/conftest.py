@@ -15,19 +15,22 @@ from alembic.command import upgrade as alembic_upgrade
 from alembic.config import Config as AlembicConfig
 
 from data.db import database
-from data.db.models import User
+from data.db.models import User, Base
+
+from test.utils.common import random_lower_string
 
 from config import CREDENTIAL_SECRET_KEY, CREDENTIAL_ALGORITHM
 
-TEST_USERNAME = "test"
-TEST_USERMAIL = "test@test.com"
+TEST_USERNAME = f"{random_lower_string(10)}"
+TEST_USERMAIL = f"{random_lower_string(10)}@test.com"
 TEST_PASSWORD = "test"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24
 
 
-@pytest.fixture(scope="session")
+@pytest_asyncio.fixture(scope="session")
 def event_loop():
-    loop = asyncio.get_event_loop()
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
     yield loop
     loop.close()
 
@@ -43,27 +46,24 @@ async def test_client() -> httpx.AsyncClient:  # Test Client
 
 
 @pytest_asyncio.fixture(scope="session")
-def db() -> dict:
-    try:
-        engine = create_async_engine(url="sqlite+aiosqlite:///:memory:")
-        session = async_sessionmaker(bind=engine, expire_on_commit=False)
-        alembic_config = AlembicConfig("alembic.ini")
+async def db(event_loop) -> dict:
+    engine = create_async_engine(url="sqlite+aiosqlite:///test.db")
+    session = async_sessionmaker(bind=engine, expire_on_commit=False)
 
-        alembic_config.set_main_option("sqlalchemy_url", "sqlite+aiosqlite:///:memory:")
+    _db = {"engine": engine, "session": session}
 
-        alembic_upgrade(alembic_config, "head")
+    yield _db
 
-        _db = {"engine": engine, "session": session}
-
-        yield _db
-
-    finally:
-        engine.dispose()
+    await engine.dispose()
 
 
 @pytest_asyncio.fixture
-async def test_headers():
+async def test_headers(db):
     user = User(username=TEST_USERNAME, email=TEST_USERMAIL, password=TEST_PASSWORD)
+    async with db["session"]() as session:
+        session.add(user)
+        await session.commit()
+        await session.refresh(user)
 
     payload = {
         "sub": user.username,
