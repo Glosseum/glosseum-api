@@ -40,7 +40,6 @@ class ArticleAppend(BaseModel):
     id, 반응(로직), 제목, 내용을 입력받습니다.
     """
 
-    id: int
     logic: ArticleLogic
     name: str
     content: str

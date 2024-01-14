@@ -8,6 +8,7 @@ from sqlalchemy.exc import IntegrityError
 import endpoint.comment.repository as repo
 from data.db.models import Article, Comment
 
+from endpoint.article.service import get_article_by_id
 
 async def create_new_comment(
     content: str, article_id: int, user_id: int
@@ -18,9 +19,11 @@ async def create_new_comment(
     if len(content) >= 100:
         raise HTTPException(status_code=400, detail="댓글은 100자 이내여야 합니다.")
 
+    _article = await get_article_by_id(article_id)
+
     try:
         res = await repo.create_comment(
-            {"content": content, "article_id": article_id, "creator_id": user_id}
+            {"content": content, "article_id": _article.id, "creator_id": user_id}
         )
         return res
     except IntegrityError as e:

@@ -48,8 +48,8 @@ async def create_article(article_req: dict, session: AsyncSession = None) -> Art
 
     _article = Article(**article_req)
 
-    stmt = insert(_article)
-    res = await session.execute(stmt)
+    session.add(_article)
+
     await session.commit()
 
     _article.path = _article.path + f"/{_article.id}"
@@ -57,7 +57,7 @@ async def create_article(article_req: dict, session: AsyncSession = None) -> Art
 
     await session.refresh(_article)
 
-    return res
+    return _article
 
 
 @Transactional()
