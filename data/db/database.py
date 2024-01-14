@@ -20,7 +20,7 @@ class Transactional:
     def __call__(self, func):
         @wraps(func)
         async def _transactional(*args, **kwargs):
-            async with async_session as session:
+            async with async_session() as session:
                 if kwargs.get("session"):
                     result = await func(*args, **kwargs)
                     await session.commit()

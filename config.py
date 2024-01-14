@@ -18,3 +18,5 @@ DB_CONFIG = {
     "port": os.getenv("DB_PORT", "5432"),
     "db": os.getenv("DB", ""),
 }
+
+UNIVCERT_API_KEY = os.getenv("UNIVCERT_API_KEY", "")
