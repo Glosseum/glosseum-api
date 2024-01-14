@@ -34,4 +34,4 @@ jobs:
           docker-compose run \
           --rm \
           --build \
-          python test/utils/db_setup.py && pytest --verbose --disable-warnings
+          ./test.sh
