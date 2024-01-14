@@ -18,14 +18,14 @@ from endpoint.user.repository import User
 
 router = APIRouter(prefix="/user")
 
+
 @router.post("/univ_verify", status_code=status.HTTP_204_NO_CONTENT, tags=["User"])
 async def univ_verify(_univ_verify: UnivVerify):
     """
     유저의 대학교 이메일에 인증 코드를 전송할 때의 라우팅 경로를 정의합니다.
     """
-    await verify_univ(
-        _univ_verify.email
-    )
+    await verify_univ(_univ_verify.email)
+
 
 @router.post("/register", status_code=status.HTTP_204_NO_CONTENT, tags=["User"])
 async def register(_user_create: UserCreate):

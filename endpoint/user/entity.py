@@ -4,6 +4,7 @@
 
 from pydantic import BaseModel
 
+
 class UnivVerify(BaseModel):
     """
     유저의 대학교 이메일을 검증할 때에는 이메일을 입력받습니다.
