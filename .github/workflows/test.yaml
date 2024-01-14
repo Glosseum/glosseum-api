@@ -16,7 +16,7 @@ jobs:
 
       - name: Test
         run: |
-          export SITE_ENV = test
+          export SITE_ENV=test
           
           export DB_HOST=${{ secrets.DB_HOST }}
           export DB_USER=${{ secrets.DB_USER }}
