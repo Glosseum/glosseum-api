@@ -43,3 +43,13 @@ app.include_router(user_router)
 app.include_router(board_router)
 app.include_router(article_router)
 app.include_router(comment_router)
+
+
+@app.on_event("startup")
+async def startup():
+    print("APP STARTUP")
+
+
+@app.on_event("shutdown")
+async def shutdown():
+    print("APP SHUTDOWN")
