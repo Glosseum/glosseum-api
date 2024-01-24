@@ -5,17 +5,26 @@
 from fastapi import APIRouter, Depends, status
 from fastapi.security import OAuth2PasswordRequestForm
 from endpoint.user.service import (
+    verify_univ,
     register_user,
     get_current_user,
     update_current_user,
     verify_user,
     delete_current_user,
 )
-from endpoint.user.entity import UserGet, UserCreate, UserUpdate, Token
+from endpoint.user.entity import UnivVerify, UserGet, UserCreate, UserUpdate, Token
 from endpoint.user.repository import User
 
 
 router = APIRouter(prefix="/user")
+
+
+@router.post("/univ_verify", status_code=status.HTTP_204_NO_CONTENT, tags=["User"])
+async def univ_verify(_univ_verify: UnivVerify):
+    """
+    유저의 대학교 이메일에 인증 코드를 전송할 때의 라우팅 경로를 정의합니다.
+    """
+    await verify_univ(_univ_verify.email)
 
 
 @router.post("/register", status_code=status.HTTP_204_NO_CONTENT, tags=["User"])
@@ -26,6 +35,7 @@ async def register(_user_create: UserCreate):
     await register_user(
         _user_create.username,
         _user_create.email,
+        _user_create.verification_code,
         _user_create.password1,
         _user_create.password2,
     )

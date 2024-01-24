@@ -29,6 +29,7 @@ async def create_board(_board_create: BoardCreate, user=Depends(get_current_user
         board_name=_board_create.name,
         board_description=_board_create.description,
         user_id=user.id,
+        user=user,
     )
 
 

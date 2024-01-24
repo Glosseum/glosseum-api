@@ -5,6 +5,7 @@
 
 from enum import Enum
 from pydantic import BaseModel, constr, ValidationError, field_validator
+from pydantic import BaseModel, constr, ValidationError, field_validator
 
 
 class ArticleLogic(str, Enum):
@@ -15,6 +16,9 @@ class ArticleLogic(str, Enum):
     AGREE = "AGREE"
     DISAGREE = "DISAGREE"
     NEUTRAL = "NEUTRAL"
+
+    def __str__(self):
+        return str(self.value)
 
 
 class ArticleCreate(BaseModel):
@@ -40,7 +44,6 @@ class ArticleAppend(BaseModel):
     id, 반응(로직), 제목, 내용을 입력받습니다.
     """
 
-    id: int
     logic: ArticleLogic
     name: str
     content: str

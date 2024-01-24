@@ -5,13 +5,29 @@
 from pydantic import BaseModel
 
 
+class UnivVerify(BaseModel):
+    """
+    유저의 대학교 이메일을 검증할 때에는 이메일을 입력받습니다.
+    """
+
+    email: str = "email@email.com"
+
+    class Config:
+        """
+        SQLAlchemy의 ORM Model 형태의 데이터를 Pydantic 모델로 변환합니다.
+        """
+
+        orm_mode = True
+
+
 class UserCreate(BaseModel):
     """
-    유저를 생성할 때에는 사용자명, 이메일, 비밀번호 1, 비밀번호 2를 입력받습니다.
+    유저를 생성할 때에는 사용자명, 이메일, 인증 코드, 비밀번호 1, 비밀번호 2를 입력받습니다.
     """
 
     username: str
     email: str = "email@email.com"
+    verification_code: int
     password1: str
     password2: str
 

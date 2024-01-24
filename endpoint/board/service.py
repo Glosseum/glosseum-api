@@ -12,7 +12,7 @@ from endpoint.board.repository import (
     delete_board,
     get_boards,
 )
-from data.db.models import Board
+from data.db.models import Board, User
 
 
 async def get_board_by_id(board_id: int) -> Board:
@@ -51,7 +51,7 @@ async def get_board_list(per_page: int, page: int) -> list[Board]:
 
 
 async def create_new_board(
-    board_name: str, board_description: str, user_id: int
+    board_name: str, board_description: str, user_id: int, user: User
 ) -> Board:
     """
     새 불판을 생성할 때의 구체적인 동작을 정의합니다.
@@ -59,9 +59,10 @@ async def create_new_board(
     try:
         res = await create_board(
             {
-                "creator_id": user_id,
                 "name": board_name,
                 "description": board_description,
+                "creator_id": user_id,
+                "creator": user,
             }
         )
 

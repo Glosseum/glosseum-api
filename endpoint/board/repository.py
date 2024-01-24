@@ -57,16 +57,15 @@ async def create_board(board_req: dict, session: AsyncSession = None) -> Board:
     """
     불판을 생성한 후, 그 불판을 반환합니다.
     """
+
     _board = Board(**board_req)
 
-    stmt = insert(Board)
-
-    res = await session.execute(stmt)
+    session.add(_board)
 
     await session.commit()
     await session.refresh(_board)
 
-    return res
+    return _board
 
 
 @Transactional()
