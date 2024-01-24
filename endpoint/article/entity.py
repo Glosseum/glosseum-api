@@ -5,6 +5,7 @@
 
 from enum import Enum
 from pydantic import BaseModel, constr, ValidationError, field_validator
+from pydantic import BaseModel, constr, ValidationError, field_validator
 
 
 class ArticleLogic(str, Enum):

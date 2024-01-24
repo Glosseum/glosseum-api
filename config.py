@@ -20,3 +20,5 @@ DB_CONFIG = {
 }
 
 UNIVCERT_API_KEY = os.getenv("UNIVCERT_API_KEY", "")
+
+SITE_ENV = os.getenv("SITE_ENV", "test")
